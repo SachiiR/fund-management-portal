@@ -1,0 +1,138 @@
+<div class="admin-table-container d-flex flex-column vh-100">
+  <!-- Loading & Error States -->
+  <div class="loading-overlay d-flex flex-column align-items-center justify-content-center flex-grow-1" *ngIf="loading()">
+    <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-dark">Loading funds...</p>
+  </div>
+
+  <div class="error-message d-flex align-items-center justify-content-center text-danger flex-grow-1" *ngIf="error() && !loading()">
+    <i class="bi bi-exclamation-triangle-fill fs-1 me-3"></i>
+    <span>{{ error() }}</span>
+  </div>
+
+  <!-- Main content -->
+  <ng-container *ngIf="!loading() && !error()">
+    <!-- Filters / Top Bar -->
+    <div class="top-bar card shadow-sm mb-4 bg-white border-0">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <h4 class="mb-0 fw-semibold text-dark">Funds Overview</h4>
+
+        <div class="d-flex gap-2">
+          <input
+            type="text"
+            class="form-control form-control-sm border-secondary"
+            placeholder="Search funds..."
+            style="width: 220px;"
+          />
+          <button class="btn btn-sm btn-primary">
+            <i class="bi bi-funnel"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table Card – now fills remaining height -->
+    <div class="table-card card shadow-sm flex-grow-1 d-flex flex-column border-0 overflow-hidden bg-white">
+      <!-- Table Header (fixed) -->
+      <div class="table-header bg-light border-bottom">
+        <div class="d-flex justify-content-between align-items-center px-3 py-2">
+          <h5 class="mb-0 fw-medium text-dark">Funds List</h5>
+          <span class="text-muted small">Showing {{ paginatedFunds.length }} of {{ filteredFunds.length }}</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Table Body -->
+      <div class="table-body flex-grow-1 overflow-auto">
+        <table class="table table-hover table-bordered mb-0 funds-table">
+          <thead class="bg-light sticky-top">
+            <tr>
+              <th>Fund Name</th>
+              <th>Strategies</th>
+              <th>Geographies</th>
+              <th>Currency</th>
+              <th>Fund Size</th>
+              <th>Vintage</th>
+              <th>Managers</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let fund of paginatedFunds"
+              
+                class="row-hover">
+
+              <td class="fw-semibold text-primary"   (click)="goToFund(fund.name)">{{ fund.name }}</td>
+
+              <td>
+                <span *ngFor="let s of fund.strategies"
+                      class="badge bg-primary-subtle text-primary me-1">
+                  {{ s }}
+                </span>
+              </td>
+
+              <td>
+                <span *ngFor="let g of fund.geographies"
+                      class="badge bg-light text-dark border me-1">
+                  {{ g }}
+                </span>
+              </td>
+
+              <td>{{ fund.currency }}</td>
+              <td>{{ formatSize(fund.fundSize) }}</td>
+              <td>{{ fund.vintage }}</td>
+
+              <td>
+                <span *ngFor="let m of fund.managers"
+                      class="badge bg-info-subtle text-info me-1">
+                  {{ m }}
+                </span>
+              </td>
+
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary me-2"
+                        (click)="goToFund(fund.name); $event.stopPropagation()">
+                  <i class="bi bi-eye"></i>
+                </button>
+
+                <button class="btn btn-sm btn-outline-warning"
+                        (click)="goToEdit(fund.name, $event)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="paginatedFunds.length === 0">
+              <td colspan="8" class="text-center py-5 text-muted">
+                No funds match the current filters
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination – always at bottom -->
+      <div class="card-footer bg-light border-top">
+        <ul class="pagination pagination-sm justify-content-center mb-0">
+          <li class="page-item" [class.disabled]="currentPage() === 0">
+            <button class="page-link" (click)="previousPage()">Previous</button>
+          </li>
+
+          <li class="page-item"
+              *ngFor="let i of [].constructor(totalPages()); let page = index"
+              [class.active]="currentPage() === page">
+            <button class="page-link" (click)="goToPage(page)">
+              {{ page + 1 }}
+            </button>
+          </li>
+
+          <li class="page-item"
+              [class.disabled]="currentPage() === totalPages() - 1">
+            <button class="page-link" (click)="nextPage()">Next</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</div>

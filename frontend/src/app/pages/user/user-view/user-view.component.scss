@@ -1,0 +1,51 @@
+.user-view-container {
+    background: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .fund-card {
+    max-width: 850px;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+  }
+  
+  .stat-box, .section-box {
+    transition: transform 0.2s ease;
+  }
+  
+  .stat-box:hover, .section-box:hover {
+    transform: translateY(-4px);
+  }
+  
+  .card-header {
+    padding: 1rem 1.25rem;
+  }
+  
+  .card-body {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .card-footer {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.8em;
+  }
+  
+  @media (max-width: 768px) {
+    .stat-box, .section-box {
+      margin-bottom: 0.75rem;
+    }
+    .card-header, .card-body, .card-footer {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
