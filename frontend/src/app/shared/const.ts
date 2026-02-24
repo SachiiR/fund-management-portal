@@ -1,4 +1,17 @@
-const BASE_URL = 'http://localhost:3000/api';
-export const API_ENDPOINT = {
-    FUND: `${BASE_URL}/funds`,
-  } as const;
+import { Fund } from '../models/fund.model';
+
+export interface AppState {
+  funds: FundsState;
+  auth: AuthState;
+}
+
+export interface FundsState {
+  funds: Fund[];
+  loading: boolean;
+  error: string | null;
+}
+
+export interface AuthState {
+  isAdmin: boolean;
+  token: string | null;
+}
