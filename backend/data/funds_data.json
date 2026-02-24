@@ -1,6 +1,6 @@
 [
   {
-    "name": "KIM Fund 3",
+    "name": "KIM Fund 3 d",
     "strategies": [
       "Venture Capital",
       "Hedge Fund"
@@ -10,7 +10,7 @@
       "Middle East"
     ],
     "currency": "CAD",
-    "fundSize": 1199.0,
+    "fundSize": 1199,
     "vintage": 2025,
     "managers": [
       "Silver Rock",
