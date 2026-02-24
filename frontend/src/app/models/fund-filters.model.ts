@@ -9,4 +9,6 @@ export interface FundFilters {
     fundSizeMax: string;
     vintageMin: string;
     vintageMax: string;
+    search: string;
+    description: string;
   }

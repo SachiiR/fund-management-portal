@@ -1,23 +1,25 @@
 [
   {
-    "name": "KIM Fund 3 d",
+    "name": "KIM Fund 3",
     "strategies": [
       "Venture Capital",
-      "Hedge Fund"
+      "Real Estate",
+      "Private Equity"
     ],
     "geographies": [
       "Global",
-      "Middle East"
+      "Middle East",
+      "Asia"
     ],
-    "currency": "CAD",
-    "fundSize": 1199,
-    "vintage": 2025,
+    "currency": "USD",
+    "fundSize": 1202,
+    "vintage": 2027,
     "managers": [
       "Silver Rock",
       "Orion Equity",
       "Blue Lake Fund"
     ],
-    "description": "Hedge fund with a long/short equity strategy."
+    "description": "Hedge fund with a long/short equity strategy. "
   },
   {
     "name": "ZRE Fund 75",
@@ -27,7 +29,7 @@
     "geographies": [
       "Middle East"
     ],
-    "currency": "CNY",
+    "currency": "CAD",
     "fundSize": 1269.22,
     "vintage": 2015,
     "managers": [

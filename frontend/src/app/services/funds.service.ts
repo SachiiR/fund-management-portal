@@ -16,11 +16,11 @@ export class FundsService {
     }
   
     getFundByName(name: string): Observable<Fund> {
-      return this.http.get<Fund>(`${API_ENDPOINT.FUND}/${name}`);
+      return this.http.get<Fund>(`${API_ENDPOINT.FUND}/${name.trim()}`);
     }
   
     updateFund(name: string, data: Partial<Fund>): Observable<Fund> {
-      return this.http.put<Fund>(`${API_ENDPOINT.FUND}/${name}`, data);
+      return this.http.put<Fund>(`${API_ENDPOINT.FUND}/${name.trim()}`, data);
     }
   
     deleteFund(name: string): Observable<{ message: string }> {

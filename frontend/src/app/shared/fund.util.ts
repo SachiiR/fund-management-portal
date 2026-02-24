@@ -4,9 +4,27 @@ import { FundSortKey, SortDirection } from './types';
 
 export function filterFunds(funds: Fund[], filters: FundFilters): Fund[] {
   return funds.filter(f => {
+
+    if (filters.search?.trim()) {
+      const term = filters.search.toLowerCase().trim();
+      const matches =
+        f.name.toLowerCase().includes(term) ||
+        f.strategies.some(s => s.toLowerCase().includes(term)) ||
+        f.geographies.some(g => g.toLowerCase().includes(term)) ||
+        f.managers.some(m => m.toLowerCase().includes(term)) ||
+        f.description.toLowerCase().includes(term) ||
+        f.currency.toLowerCase().includes(term);
+      if (!matches) return false;
+    }
     // Name (free text search)
     if (filters.name?.trim()) {
       if (!f.name.toLowerCase().includes(filters.name.toLowerCase().trim())) {
+        return false;
+      }
+    }
+
+    if (filters.description?.trim()) {
+      if (!f.description?.toLowerCase().includes(filters.description.toLowerCase().trim())) {
         return false;
       }
     }
@@ -25,22 +43,33 @@ export function filterFunds(funds: Fund[], filters: FundFilters): Fund[] {
     }
 
     // Single value
-    if (filters.currency?.trim() && f.currency !== filters.currency.trim()) {
+    if (filters.currency && f.currency !== filters.currency) {
       return false;
     }
 
-    // Numeric ranges – skip if empty/invalid
-    const minSize = filters.fundSizeMin?.trim() ? parseFloat(filters.fundSizeMin.trim()) : NaN;
-    if (!isNaN(minSize) && f.fundSize < minSize) return false;
+// Fund Size (min/max as numbers, ignore if empty or invalid)
+const size = f.fundSize;
+const minSize = filters.fundSizeMin ? parseFloat(filters.fundSizeMin) : null;
+const maxSize = filters.fundSizeMax ? parseFloat(filters.fundSizeMax) : null;
 
-    const maxSize = filters.fundSizeMax?.trim() ? parseFloat(filters.fundSizeMax.trim()) : NaN;
-    if (!isNaN(maxSize) && f.fundSize > maxSize) return false;
+if (minSize !== null && (isNaN(minSize) || size < minSize)) {
+  return false;
+}
+if (maxSize !== null && (isNaN(maxSize) || size > maxSize)) {
+  return false;
+}
 
-    const minVintage = filters.vintageMin?.trim() ? parseInt(filters.vintageMin.trim(), 10) : NaN;
-    if (!isNaN(minVintage) && f.vintage < minVintage) return false;
+// Vintage (min/max as numbers, ignore if empty or invalid)
+const vintage = f.vintage;
+const minVintage = filters.vintageMin ? parseInt(filters.vintageMin, 10) : null;
+const maxVintage = filters.vintageMax ? parseInt(filters.vintageMax, 10) : null;
 
-    const maxVintage = filters.vintageMax?.trim() ? parseInt(filters.vintageMax.trim(), 10) : NaN;
-    if (!isNaN(maxVintage) && f.vintage > maxVintage) return false;
+if (minVintage !== null && (isNaN(minVintage) || vintage < minVintage)) {
+  return false;
+}
+if (maxVintage !== null && (isNaN(maxVintage) || vintage > maxVintage)) {
+  return false;
+}
 
     return true;
   });
@@ -92,7 +121,9 @@ export function emptyFilters(): FundFilters {
     fundSizeMin: '',
     fundSizeMax: '',
     vintageMin: '',
-    vintageMax: ''
+    vintageMax: '',
+    search: '',
+    description: '',
   };
 }
 

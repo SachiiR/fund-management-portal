@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { FundsService } from '../../../services/funds.service';
 import { Fund } from '../../../models/fund.model';
 import { FundFilters } from '../../../models/fund-filters.model';
 import { emptyFilters, filterFunds, formatFundSize } from '../../../shared/fund.util';
+import { CURRENCIES, GEOGRAPHIES, MANAGERS, STRATEGIES } from './../../../shared/const';
 
 @Component({
   selector: 'app-admin-table',
@@ -16,12 +17,8 @@ import { emptyFilters, filterFunds, formatFundSize } from '../../../shared/fund.
   styleUrls: ['./admin-table.component.scss']
 })
 export class AdminTableComponent implements OnInit {
-
-  // ────────────────────────────────────────────────
-  // Data & state
-  // ────────────────────────────────────────────────
-  funds = signal<Fund[]>([]);                    // all loaded funds
-  filteredFunds = signal<Fund[]>([]);            // after filtering & sorting
+  funds = signal<Fund[]>([]);                    
+  filteredFunds = signal<Fund[]>([]);            
 
   currentPage = signal(0);
   pageSize = signal(10);
@@ -32,10 +29,44 @@ export class AdminTableComponent implements OnInit {
 
   loading = signal(true);
   error = signal('');
-
   filters: FundFilters = emptyFilters();
-
   displayedColumns = ['name', 'strategies', 'geographies', 'currency', 'fundSize', 'vintage', 'managers', 'actions'];
+  openDropdown: string | null = null;
+
+  currencies = CURRENCIES;
+  strategies = STRATEGIES;
+  geographies = GEOGRAPHIES;
+  managers = MANAGERS;
+
+  constructor(
+    private fundsService: FundsService,
+    private router: Router,
+  ) {
+  }
+
+  ngOnInit(): void {
+    this.loadFunds();
+  }
+
+  toggleDropdown(name: string): void {
+    this.openDropdown = this.openDropdown === name ? null : name;
+  }
+  
+  toggleArrayFilter(field: 'strategies' | 'geographies' | 'managers', value: string): void {
+    const current = this.filters[field];
+    const index = current.indexOf(value);
+    if (index > -1) {
+      this.filters[field] = current.filter(v => v !== value);
+    } else {
+      this.filters[field] = [...current, value];
+    }
+    this.applyFilters();
+  }
+  
+  @HostListener('document:click')
+  closeDropdowns(): void {
+    this.openDropdown = null;
+  }
 
   get activeFilterCount(): number {
     return Object.values(this.filters).filter(v => 
@@ -43,28 +74,6 @@ export class AdminTableComponent implements OnInit {
     ).length;
   }
 
-  // Computed getters for dropdown options
-  get allStrategies(): string[] {
-    return [...new Set(this.funds().flatMap(f => f.strategies))].sort();
-  }
-  get allGeographies(): string[] {
-    return [...new Set(this.funds().flatMap(f => f.geographies))].sort();
-  }
-  get allCurrencies(): string[] {
-    return [...new Set(this.funds().map(f => f.currency))].sort();
-  }
-  get allManagers(): string[] {
-    return [...new Set(this.funds().flatMap(f => f.managers))].sort();
-  }
-
-  constructor(
-    private fundsService: FundsService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.loadFunds();
-  }
 
   private loadFunds() {
     this.loading.set(true);
@@ -81,10 +90,9 @@ export class AdminTableComponent implements OnInit {
     });
   }
 
-  // ────────────────────────────────────────────────
-  // Filtering
-  // ────────────────────────────────────────────────
   applyFilters(): void {
+    console.log('fundSizeMin:', this.filters.fundSizeMin, typeof this.filters.fundSizeMin);
+      console.log('fundSizeMax:', this.filters.fundSizeMax, typeof this.filters.fundSizeMax);
     this.applyFiltersAndSort();
   }
 
@@ -105,9 +113,6 @@ export class AdminTableComponent implements OnInit {
     this.updatePagination();
   }
 
-  // ────────────────────────────────────────────────
-  // Sorting
-  // ────────────────────────────────────────────────
   sort(column: keyof Fund): void {
     if (this.sortColumn() === column) {
       // toggle direction
@@ -118,29 +123,60 @@ export class AdminTableComponent implements OnInit {
     }
     this.applyFiltersAndSort();
   }
+  
+
+  // private sortFunds(data: Fund[], column: keyof Fund, direction: 'asc' | 'desc'): Fund[] {
+  //   return [...data].sort((a, b) => {
+  //     const valA = a[column];
+  //     const valB = b[column];
+
+  //     let comparison = 0;
+
+  //     if (Array.isArray(valA) && Array.isArray(valB)) {
+  //       comparison = valA.join(',').localeCompare(valB.join(','));
+  //     } else if (typeof valA === 'number' && typeof valB === 'number') {
+  //       comparison = valA - valB;
+  //     } else {
+  //       comparison = String(valA ?? '').localeCompare(String(valB ?? ''));
+  //     }
+
+  //     return direction === 'asc' ? comparison : -comparison;
+  //   });
+  // }
 
   private sortFunds(data: Fund[], column: keyof Fund, direction: 'asc' | 'desc'): Fund[] {
     return [...data].sort((a, b) => {
-      const valA = a[column];
-      const valB = b[column];
-
-      let comparison = 0;
-
+      let valA = a[column];
+      let valB = b[column];
+  
+      // Handle arrays (e.g. strategies, geographies, managers)
       if (Array.isArray(valA) && Array.isArray(valB)) {
-        comparison = valA.join(',').localeCompare(valB.join(','));
-      } else if (typeof valA === 'number' && typeof valB === 'number') {
-        comparison = valA - valB;
-      } else {
-        comparison = String(valA ?? '').localeCompare(String(valB ?? ''));
+        // Sort by length first
+        if (valA.length !== valB.length) {
+          return direction === 'asc' 
+            ? valA.length - valB.length 
+            : valB.length - valA.length;
+        }
+        // Then by joined string
+        valA = valA.join(', ').toLowerCase();
+        valB = valB.join(', ').toLowerCase();
       }
-
-      return direction === 'asc' ? comparison : -comparison;
+  
+      // Handle numbers (fundSize, vintage)
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return direction === 'asc' ? valA - valB : valB - valA;
+      }
+  
+      // Default: string comparison
+      const strA = String(valA ?? '').toLowerCase();
+      const strB = String(valB ?? '').toLowerCase();
+  
+      if (strA < strB) return direction === 'asc' ? -1 : 1;
+      if (strA > strB) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
-  // ────────────────────────────────────────────────
-  // Pagination (manual)
-  // ────────────────────────────────────────────────
   private updatePagination() {
     const total = this.filteredFunds().length;
     this.totalPages.set(Math.ceil(total / this.pageSize()));
@@ -173,9 +209,7 @@ export class AdminTableComponent implements OnInit {
     }
   }
 
-  // ────────────────────────────────────────────────
-  // Navigation & formatting (unchanged)
-  // ────────────────────────────────────────────────
+
   goToFund(name: string): void {
     this.router.navigate(['/user/view', encodeURIComponent(name)]);
   }
