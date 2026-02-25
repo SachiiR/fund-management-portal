@@ -35,7 +35,7 @@ Data is stored in a simple JSON file on the backend (Node.js + Express).
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/SachiiR/fund-management-portal/
+git clone https://github.com/SachiiR/fund-management-portal.git
 cd fund-management-portal
 ```
 ### 2. Install dependencies
@@ -99,5 +99,6 @@ Unit/integration tests
 - Name: Sachini Rosa
 - Email: sachii.r@gmail.com
 - Message: Assesment for Full Stack developer position
+
 
 
