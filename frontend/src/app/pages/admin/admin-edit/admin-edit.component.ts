@@ -5,12 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FundsService } from '../../../services/funds.service';
 import { Fund } from '../../../models/fund.model';
 import { debounceTime, distinctUntilChanged, take } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { setSelectedFund } from './../../../store/action/funds.action';
-import { selectCurrentFund } from './../../../store/selector/funds.selector';
 import { CURRENCIES, STRATEGIES, GEOGRAPHIES, MANAGERS } from '../../../shared/const';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FundStateService } from './../../../services/fund-state.srvice';
 
 @Component({
   selector: 'app-admin-edit',
@@ -26,7 +25,7 @@ export class AdminEditComponent implements OnInit {
   saving = false;
   openDropdown: 'strategies' | 'geographies' | 'managers' | null = null;
 
-  originalFund$: Observable<Fund>;
+  // originalFund$: Observable<Fund>;
 
   currencies = CURRENCIES;
   strategies = STRATEGIES;
@@ -38,13 +37,13 @@ export class AdminEditComponent implements OnInit {
   private autoSaveSubject = new Subject<Partial<Fund>>();
 
   constructor(
-    private store: Store,
     private route: ActivatedRoute,
     private router: Router,
     private fundsService: FundsService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private fundState: FundStateService,
   ) {
-    this.originalFund$ = this.store.select(selectCurrentFund);
+    // this.originalFund$ = this.store.select(selectCurrentFund);
   }
 
   ngOnInit(): void {
@@ -59,7 +58,8 @@ export class AdminEditComponent implements OnInit {
     this.fundsService.getFundByName(fundName).subscribe({
       next: (data) => {
         this.fund = { ...data };
-        this.store.dispatch(setSelectedFund({ fund: data }));
+        // this.store.dispatch(setSelectedFund({ fund: data }));
+        this.fundState.originalFund.set(data);
         this.loading = false;
         this.setupAutoSave();
       },
@@ -134,32 +134,31 @@ export class AdminEditComponent implements OnInit {
     this.router.navigate(['/admin/funds']);
   }
 
+  // cancel(): void {
+    // this.originalFund$.pipe(take(1)).subscribe(original => {
+    //   if (original) {
+    //     this.fundsService.updateFund(original.name, original).subscribe({
+    //       next: () => this.router.navigate(['/admin/funds']),
+    //       error: () => this.router.navigate(['/admin/funds'])
+    //     });
+    //   } else {
+    //     this.router.navigate(['/admin/funds']);
+    //   }
+    // });
+  // }
+
   cancel(): void {
-    this.originalFund$.pipe(take(1)).subscribe(original => {
-      if (original) {
-        this.fundsService.updateFund(original.name, original).subscribe({
-          next: () => this.router.navigate(['/admin/funds']),
-          error: () => this.router.navigate(['/admin/funds'])
-        });
-      } else {
-        this.router.navigate(['/admin/funds']);
-      }
-    });
+    const original = this.fundState?.originalFund();
+    if (original) {
+      this.fundsService.updateFund(original.name, original).subscribe({
+        next: () => this.router.navigate(['/admin/funds']),
+        error: () => this.router.navigate(['/admin/funds'])
+      });
+    } else {
+      this.router.navigate(['/admin/funds']);
+    }
   }
 
-  // deleteFund(): void {
-  //   if (!this.fund || !confirm(`Are you sure you want to delete "${this.fund.name}"?`)) return;
-  //   this.fundsService.deleteFund(this.fund.name).subscribe({
-  //     next: () => {
-  //       alert('Fund deleted successfully');
-  //       this.router.navigate(['/admin/funds']);
-  //     },
-  //     error: (err) => {
-  //       console.error('Delete failed:', err);
-  //       this.error = 'Failed to delete fund';
-  //     }
-  //   });
-  // }
   openDeleteModal(content: TemplateRef<any>): void {
     this.modalService.open(content, { centered: true, backdrop: 'static' })
       .result.then(result => {
