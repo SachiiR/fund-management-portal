@@ -1,56 +1,102 @@
-### ✅ TODO
+# Funds Dashboard
 
-We are evaluating you based on your front-end and back-end capabilities. Please complete the task to the best of your abilities.
+A modern Angular application for managing and viewing investment funds data.
 
-#### Components to Implement
+- **Admin View**: Full table with filtering, sorting, pagination, view/edit actions
+- **User View**: Clean, read-only detail page for each fund
+- **Admin Edit**: Edit fund details with auto-save on change + delete with confirmation
 
-You are expected to create at least **three components**:
+Data is stored in a simple JSON file on the backend (Node.js + Express).
 
----
+## Features
 
-#### 1. Admin Data Table View
+- Responsive UI 
+- Real-time filtering 
+- Column sorting 
+- Auto-save edits in admin edit view
+- Delete fund 
+- Navigation: Admin → User View / Edit View 
 
-- Create an API function that fetches data from `backend/data/funds_data.json`.
-- Display the data in a table format.
-- Create Filters for each property in the dataset to be able to get select values.
-- Allow the admin to sort the dataset in the table; organizing by least to greatest, greatest to least.. etc
-- Style the table using your best UI/UX judgment.
-- When clicking on the **Name** of a data point, navigate to the **User Facing Data View**.
-- Include an edit icon (e.g., a pencil) that navigates to the **Admin Edit View**.
+## Tech Stack
 
----
+- **Frontend**: Angular 19+, Bootstrap 5, Bootstrap Icons
+- **Backend**: Node.js, Express, ts-node (simple JSON file storage)
+- **State**: Angular Signals for reactive data
+- **Routing**: Lazy-loaded routes
 
-#### 2. User Facing Data View
+## Prerequisites
 
-- Create an API function to fetch a **single data point** from `backend/data/funds_data.json`.
-- Display all available information for that data point.
-- Style the view using your best UI/UX judgment.
+- Node.js ≥ 18
+- npm or yarn
+- Git
 
----
+## Setup & Run
 
-#### 3. Admin Edit View
+### 1. Clone the repository
 
-- Create an API function to fetch and edit a **single data point** from `backend/data/funds_data.json`.
-- Allow the admin to **edit** and **delete** the data.
-- Automatically save changes when the admin finishes editing.
-- Design the view using your best UI/UX judgment.
-- You may implement this as a **separate page** or a **modal/dialog** (e.g., MatDialog).
+```bash
+git clone https://github.com/SachiiR/fund-management-portal/
+cd fund-management-portal
+```
+### 2. Install dependencies
 
----
+#### Frontend (Angular)
+```bash
+cd frontend
+npm install
+```
+#### Backend (Node.js + Express)
+```bash
+cd backend
+npm install
+cd ..
+```
+### 3. Prepare the data file
+Ensure the file backend/data/funds_data.json exists and contains valid fund data (array of objects).
+If the file is missing or invalid JSON → the app will show an error.
 
-### Submission
+### 4. Run the application
+Open two separate terminals:
 
-- Leave following information in the [Notes](#notes) sections below
-    - Your name
-    - Your email
-    - Any message you want us to consider regarding to this project.
+#### Terminal 1 – Backend
+```bash
+cd backend
+npm start
+```
+#### Terminal 2 – Frontend
+```bash
+ng serve
+# or:
+npm start
+```
+Default landing page redirects to /admin (funds table).
 
-1. Clone this repository
-2. Create your own private GitLab/GitHub repository
-3. Push your solution there
-4. Send us the repository link
+### Quick Test Flow
+
+Go to http://localhost:4300/admin
+See the funds table
+Try filtering (search, dropdowns, min/max)
+Click column headers to sort
+
+Click a fund name → goes to User View (read-only detail)
+From table → click pencil icon → goes to Admin Edit
+Edit any field → changes auto-save after ~800ms
+Click "Delete Fund" → confirm dialog → deletes & redirects
+
+From edit → click "Cancel" → returns without saving
+
+### Next Steps / Possible Enhancements
+
+Add authentication
+Move data to a database 
+Add proper error logging
+Add toast notifications for save/delete success
+Export table to CSV
+Unit/integration tests
+
 
 ### Notes
-- Name:
-- Email:
-- Message: 
+- Name: Sachini Rosa
+- Email: sachii.r@gmail.com
+- Message: Assesment for Full Stack developer position
+
