@@ -1,4 +1,4 @@
-# Funds Dashboard
+# Funds Management Portal
 
 A modern Angular application for managing and viewing investment funds data.
 
@@ -99,4 +99,5 @@ Unit/integration tests
 - Name: Sachini Rosa
 - Email: sachii.r@gmail.com
 - Message: Assesment for Full Stack developer position
+
 
