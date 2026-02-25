@@ -73,32 +73,33 @@ Default landing page redirects to /admin (funds table).
 
 ### Quick Test Flow
 
-Go to http://localhost:4300/admin
-See the funds table
-Try filtering (search, dropdowns, min/max)
-Click column headers to sort
+- Go to http://localhost:4300/admin
+- See the funds table
+- Try filtering (search, dropdowns, min/max)
+- Click column headers to sort
 
-Click a fund name → goes to User View (read-only detail)
-From table → click pencil icon → goes to Admin Edit
-Edit any field → changes auto-save after ~800ms
-Click "Delete Fund" → confirm dialog → deletes & redirects
+- Click a fund name → goes to User View (read-only detail)
+- From table → click pencil icon → goes to Admin Edit
+- Edit any field → changes auto-save after ~800ms
+- Click "Delete Fund" → confirm dialog → deletes & redirects
 
 From edit → click "Cancel" → returns without saving
 
 ### Next Steps / Possible Enhancements
 
-Add authentication
-Move data to a database 
-Add proper error logging
-Add toast notifications for save/delete success
-Export table to CSV
-Unit/integration tests
+- Add authentication and authorization
+- Move data to a database 
+- Add proper error logging
+- Add toast notifications for save/delete success
+- Export table to CSV
+- Unit/integration tests
 
 
 ### Notes
 - Name: Sachini Rosa
 - Email: sachii.r@gmail.com
 - Message: Assesment for Full Stack developer position
+
 
 
 
